@@ -1,7 +1,11 @@
 // src/App.jsx
 import { useState } from "react";
 import LoginForm from './components/loginForm';
+<<<<<<< HEAD
 import PanelUsuario from './components/PanelUsuario';
+=======
+import PanelUsuario from './components/panelUsuario';
+>>>>>>> 2dd534b (WIP: cambios locales antes del pull)
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
