@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useState } from "react";
-import LoginForm from './components/LoginForm';
+import LoginForm from './components/loginForm';
 import PanelUsuario from './components/PanelUsuario';
 
 function App() {
