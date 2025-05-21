@@ -1,9 +1,11 @@
 require('dotenv').config();
-const express = require('express');
+
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+const express = require('express');
 const app = express();
+
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -27,7 +29,7 @@ const authRoutes = require('./routes/authRoutes');
 app.use('/api/authRoutes', authRoutes);
 
 const turnoRoutes = require('./routes/turnos');
-app.use('/api/turno', turnoRoutes);
+app.use('/api/turnos', turnoRoutes);
 
 
 // Solo un app.listen

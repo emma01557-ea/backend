@@ -43,33 +43,30 @@ router.post('/register', async (req, res) => {
 
 // Login con JWT
 router.post('/login', async (req, res) => {
-  const { dni, password } = req.body
-
-  //comprobamos los campos
-/**   if (!dni || !password) {
-      return res.status(400).json({ message: "Faltan usuario o contraseña" });
-    }
-  if (usuario !== ADMIN_USER) {
-      return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
-    }
-  const passwordIsValid = bcrypt.compareSync(password, ADMIN_PASS_HASH);
-  if (!passwordIsValid) {
-      return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
-  }**/
+  console.log('BODY:', req.body); 
+  const { dni } = req.body;
   
-  try {
-    const user = await User.findOne({ dni })
-    if (!user) return res.status(400).json({ msg: 'Credenciales inválidas' })
 
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) return res.status(400).json({ msg: 'Credenciales inválidas' })
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '2h' })
-
-    res.json({ token, user })
-  } catch (err) {
-    res.status(500).json({ msg: 'Error del servidor' })
+  if (!dni) {
+    return res.status(400).json({ message: "Falta DNI" });
   }
-})
+
+  try {
+    let user = await User.findOne({ dni });
+
+    if (!user) {
+      const newUser = new User({ dni});
+      await newUser.save();
+      user = newUser;
+    }
+
+    const token = jwt.sign({ userId: user._id, dni: user.dni, elegir: user.tipo("elegir") }, JWT_SECRET, { expiresIn: '2h' });
+
+    res.json({ token, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Error del servidor' });
+  }
+});
 
 module.exports = router

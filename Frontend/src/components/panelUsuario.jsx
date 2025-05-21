@@ -9,16 +9,17 @@ const panelUsuario = ({ user }) => {
 
   const anotarTurno = async (tipoTurno) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/turnos', {
-        dni: user.dni,
-        turno: tipoTurno
-      });
-
+      //const token = localStorage.getItem('token');
+       
+      const response = await axios.post('http://localhost:5000/api/turnos/anotarseTurno',
+        { tipo: tipoTurno }, );
+      localStorage.setItem('token', response.data.token);
+      
       setTurno(tipoTurno);
       setConfirmacion('Turno guardado con éxito');
       setError('');
     } catch (err) {
-      setError('Error al guardar el turno');
+      setError('Error al guardar el turno front');
       setConfirmacion('');
     }
   };
