@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
       //let user = await User.findOne({ dni });
      // user = existingUser;
       const token = jwt.sign({ dni: existingUser.dni, almuerzo: existingUser.almuerzo, cena:existingUser.cena }, JWT_SECRET, { expiresIn: '2h' });
-      res.json({ token, user: existingUser });
+      res.json({ token, user:existingUser });
     }
    // res.status(201).json({ msg: 'Registro exitoso' })
   } catch (err) {
