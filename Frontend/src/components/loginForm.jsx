@@ -47,6 +47,8 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
           placeholder="DNI"
           value={dni}
           onChange={(e) => setDni(e.target.value)}
+          inputMode="numeric"
+          pattern="\d*"
           required
           style={styles.input}
         />
