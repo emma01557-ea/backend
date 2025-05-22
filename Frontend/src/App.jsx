@@ -17,7 +17,8 @@ function App() {
       {!isLoggedIn ? (
         <LoginForm onLoginSuccess={handleLoginSuccess} />
       ) : (
-        <PanelUsuario user={user} />
+       // <PanelUsuario user={user} />
+        <PanelUsuario user={user} setIsLoggedIn={setIsLoggedIn} setUser={setUser} />
       )}
     </div>
   );

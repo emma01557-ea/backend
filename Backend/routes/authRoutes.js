@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const router = express.Router()
 
+
 const User = require('../models/User')
 const verifyToken = require('../middlewares/authMiddleware');
 
@@ -32,7 +33,7 @@ router.post('/register', async (req, res) => {
 
    // const hashedPassword = await bcrypt.hash(password, 10)
     //const newUser = new User({ dni, password: hashedPassword })
-    const newUser = new User({ dni})
+    const newUser = new User({dni})
     await newUser.save()
 
     res.status(201).json({ msg: 'Registro exitoso' })
@@ -43,30 +44,47 @@ router.post('/register', async (req, res) => {
 
 // Login con JWT
 router.post('/login', async (req, res) => {
+  const { dni,almuerzo,cena} = req.body;
   console.log('BODY:', req.body); 
-  const { dni } = req.body;
+  console.log('dni: ',dni);
+  console.log('almuerzo: ',almuerzo);
+  console.log('almuerzo: ',cena);
   
-
-  if (!dni) {
+  if (!req.body.dni) {
     return res.status(400).json({ message: "Falta DNI" });
   }
-
+  //BUSCAR SI EXISTE QUE INGRESE SI NO EXISTE QUE LO CREE
   try {
-    let user = await User.findOne({ dni });
-
-    if (!user) {
-      const newUser = new User({ dni});
-      await newUser.save();
-      user = newUser;
+    const existingUser = await User.findOne({ dni })
+    console.log('Existe el usuario: ',existingUser);
+    
+    if (!existingUser) {
+    //  return res.status(400).json({ msg: 'DNI ya registrado.' })
+      console.log('algo:',req.body);
+      const user = new User({dni,almuerzo,cena});
+      await user.save()
+      console.log('BODY NUEVO USUARIO:', user);
+      //const { dniNuevo,turnoNuevo } = req.body;
+      const token = jwt.sign({ dni: user.dni , almuerzo: user.almuerzo, cena:user.cena }, JWT_SECRET, { expiresIn: '2h' });  
+      res.json({ token, user });
+    }else{
+      console.log('BODY existe USUARIO else:', existingUser.dni);
+      //let user = await User.findOne({ dni });
+     // user = existingUser;
+      const token = jwt.sign({ dni: existingUser.dni, almuerzo: existingUser.almuerzo, cena:existingUser.cena }, JWT_SECRET, { expiresIn: '2h' });
+      res.json({ token, user: existingUser });
     }
-
-    const token = jwt.sign({ userId: user._id, dni: user.dni, elegir: user.tipo("elegir") }, JWT_SECRET, { expiresIn: '2h' });
-
-    res.json({ token, user });
+   // res.status(201).json({ msg: 'Registro exitoso' })
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Error del servidor' });
+    res.status(500).json({ msg: 'Error en el servidor' })
   }
+      console.log('algo fuera:',req.body);
+ //**  try {
+  //  res.json({ token, user });
+  //} catch (err) {
+  //  console.error(err);
+  //  res.status(500).json({ msg: 'Error del servidor' });
+ // }
 });
 
 module.exports = router

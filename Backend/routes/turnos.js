@@ -7,27 +7,27 @@ const auth = require('../middlewares/authMiddleware');
 
 // POST: anotarse para un turno (almuerzo o cena)
 router.post('/anotarseTurno', async (req, res) => {
-  console.log('BODY anotarse:', req.body); 
-  const { tipo } = req.body; // 'almuerzo' o 'cena'
-  const dni = req.user.dni;
+  const { dni, turno } = req.body;
 
-  console.log('Usuario autenticado:', req.user);
-  console.log('Tipo de turno:', req.body.tipo);
-  
+  if (!['almuerzo', 'cena'].includes(turno)) {
+    return res.status(400).json({ msg: 'Turno inválido' });
+  }
+
   try {
-    const nuevoUsuario = new User({ dni, tipo });
-    await nuevoUsuario.save();
+    const user = await User.findOne({ dni });
+    if (!user) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
 
-    const nuevoTurno = new Turno({ dni, tipo });
-    await nuevoTurno.save();
-    
-    
-    res.status(201).json({ msg: `Turno para ${tipo} guardado`, turno: nuevoUser });
+    user[turno] = true;
+    await user.save();
+
+    res.status(200).json({ msg: `Turno de ${turno} actualizado`, user });
   } catch (err) {
-    res.status(500).json({ msg: 'Error al guardar el turno back', error: err.message });
-    console.log('Usuario autenticado:', req.user);
-    console.log('Tipo de turno:', req.body.tipo);
+    console.error(err);
+    res.status(500).json({ msg: 'Error al actualizar el turno', error: err.message });
   }
 });
+
 
 module.exports = router;

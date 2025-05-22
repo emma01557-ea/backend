@@ -3,6 +3,8 @@ import axios from 'axios';
 
 const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
   const [dni, setDni] = useState('');
+  const almuerzo = false;
+  const cena = false;
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,16 +20,14 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/authRoutes/login', {
-        dni
-      });
+      const response = await axios.post('http://localhost:5000/api/authRoutes/login', {dni,almuerzo,cena});
       console.log("Respuesta del servidor:", response.data); 
       localStorage.setItem('token', response.data.token);
     try {
       onLoginSuccess(response.data.user);
     } catch (e) {
     console.error("Error en onLoginSuccess:", e);
-}
+    }
       onLoginSuccess(response.data.user);
     
     } catch (err) {
@@ -55,12 +55,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
         </button>
       </form>
       {error && <p style={styles.error}>{error}</p>}
-      <p>
-        ¿No tenés cuenta?{" "}
-        <button onClick={onSwitchToRegister} style={styles.link}>
-          Registrate
-        </button>
-      </p>
+      
     </div>
   );
 };
