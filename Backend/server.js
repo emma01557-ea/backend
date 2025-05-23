@@ -9,10 +9,20 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 const cors = require('cors');
-//app.use(cors());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://backend-emmanuels-projects-d9e6d035.vercel.app'
+];
+
 app.use(cors({
-  origin: '*', // Cambia a tu frontend URL en producción para más seguridad
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
