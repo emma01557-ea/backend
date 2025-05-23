@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../api';
 
 const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
   const [dni, setDni] = useState('');
@@ -20,7 +21,8 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/authRoutes/login', {dni,almuerzo,cena});
+      //const response = await axios.post('http://localhost:5000/api/authRoutes/login', {dni,almuerzo,cena});
+      const response = await axios.post('${API_BASE_URL}/authRoutes/login', {dni,almuerzo,cena});
       console.log("Respuesta del servidor:", response.data); 
       localStorage.setItem('token', response.data.token);
     try {
