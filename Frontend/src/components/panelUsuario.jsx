@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import API_BASE_URL from '../api'; // ajustá el path si es necesario
+import API_BASE_URL from '../api.js'; // ajustá el path si es necesario
 
 const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
 //const PanelUsuario = ({ user }) => {
@@ -22,7 +22,7 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
   const anotarTurno = async (turno) => {
     try {
       //const response = await axios.post('http://localhost:5000/api/turnos/anotarseTurno', {
-      const response = await axios.post('${API_BASE_URL}/turnos/anotarseTurno', {  
+      const response = await axios.post(`${API_BASE_URL}/turnos/anotarseTurno`, {  
         dni: user.dni,
         turno: turno
       });
