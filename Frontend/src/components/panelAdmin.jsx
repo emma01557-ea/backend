@@ -65,7 +65,7 @@ const PanelAdmin = ({ setVista }) => {
       const devices = await codeReader.getVideoInputDevices();
       if (devices.length === 0) throw new Error('No se encontraron cámaras');
 
-      const selectedDeviceId = devices[0].deviceId;
+      const selectedDeviceId = devices[1].deviceId;
       setCameraOn(true);
 
       codeReader.decodeFromVideoDevice(selectedDeviceId, videoRef.current, async (result, err) => {
