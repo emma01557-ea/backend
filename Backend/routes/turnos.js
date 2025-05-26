@@ -3,7 +3,10 @@ const express = require('express');
 const router = express.Router();
 //const Turno = require('../models/Turno'); // este modelo lo creamos abajo
 const User = require('../models/User');
-const auth = require('../middlewares/authMiddleware');
+//const auth = require('../middlewares/authMiddleware');
+const verifyToken = require('../middlewares/authMiddleware');
+
+
 
 const esHorarioPermitido = require('../utils/timeHelpers');
 
