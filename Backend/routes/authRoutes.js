@@ -2,6 +2,7 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const router = express.Router()
+const Admin = require('../models/Admin'); // Modelo de admin
 
 
 const User = require('../models/User')
@@ -13,34 +14,34 @@ const ADMIN_PASS_HASH = bcrypt.hashSync("1234", 8);
 const JWT_SECRET = process.env.JWT_SECRET || "mi_clave_super_secreta";
 
 // Registro (ya implementado)
-router.post('/register', async (req, res) => {
+//*router.post('/register', async (req, res) => {
  // const { dni, password } = req.body
- const dni = req.body
+ /*const dni = req.body */
 
-  if (!/^\d{7,8}$/.test(dni)) {
+  /*if (!/^\d{7,8}$/.test(dni)) {
     return res.status(400).json({ msg: 'DNI inválido.' })
-  }
+  }*/
 
  /* if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).{9,}$/.test(password)) {
     return res.status(400).json({ msg: 'Contraseña insegura.' })
   }*/
 
-  try {
+/*  try {
     const existingUser = await User.findOne({ dni })
     if (existingUser) {
       return res.status(400).json({ msg: 'DNI ya registrado.' })
-    }
+    }*/
 
    // const hashedPassword = await bcrypt.hash(password, 10)
     //const newUser = new User({ dni, password: hashedPassword })
-    const newUser = new User({dni})
+    /*const newUser = new User({dni})
     await newUser.save()
 
     res.status(201).json({ msg: 'Registro exitoso' })
   } catch (err) {
     res.status(500).json({ msg: 'Error en el servidor' })
   }
-})
+})*/
 
 // Login con JWT
 router.post('/login', async (req, res) => {
@@ -86,5 +87,35 @@ router.post('/login', async (req, res) => {
   //  res.status(500).json({ msg: 'Error del servidor' });
  // }
 });
+
+// POST /authRoutes/loginAdmin
+router.post('/loginAdmin', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const admin = await Admin.findOne({ username });
+    if (!admin) {
+      return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Contraseña incorrecta' });
+    }
+
+    const token = jwt.sign(
+      { username: admin.username, role: 'admin' },
+      process.env.JWT_SECRET || 'secreto',
+      { expiresIn: '1h' }
+    );
+
+    res.json({ token, user: { username: admin.username, role: 'admin' } });
+  } catch (err) {
+    console.error('Error al hacer login de admin:', err);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+});
+
+
 
 module.exports = router

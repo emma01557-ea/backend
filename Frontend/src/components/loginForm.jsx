@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../api';
 
-const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
+const LoginForm = ({ onLoginSuccess, onSwitchToRegister,onSwitchToAdmin}) => {
   const [dni, setDni] = useState('');
   const almuerzo = false;
   const cena = false;
@@ -22,7 +22,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
 
     try {
       //const response = await axios.post('http://localhost:5000/api/authRoutes/login', {dni,almuerzo,cena});
-      const response = await axios.post(`${API_BASE_URL}/authRoutes/login`, {dni,almuerzo,cena});
+      const response = await axios.post(`${API_BASE_URL}/authRoutes/login`, {dni});
       console.log("Respuesta del servidor:", response.data); 
       localStorage.setItem('token', response.data.token); 
     try {
@@ -30,8 +30,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
     } catch (e) {
     console.error("Error en onLoginSuccess:", e);
     }
-      onLoginSuccess(response.data.user);
-    
+      
     } catch (err) {
       console.error("Error en login:", err.response?.data || err.message);
       setError('DNI no registrado o error del servidor');
@@ -56,6 +55,9 @@ const LoginForm = ({ onLoginSuccess, onSwitchToRegister }) => {
         />
         <button type="submit" disabled={loading} style={styles.button}>
           {loading ? 'Ingresando...' : 'Ingresar'}
+        </button>
+        <button type="button" onClick={onSwitchToAdmin} style={styles.link}>
+          ¿Sos administrador?
         </button>
       </form>
       {error && <p style={styles.error}>{error}</p>}

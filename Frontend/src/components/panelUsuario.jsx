@@ -1,6 +1,55 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../api.js'; // ajustá el path si es necesario
+//import QRCode from 'qrcode.react';
+//import { QRCode } from 'qrcode.react';
+//import QRCode from 'react-qr-code';
+import { QRCode } from 'react-qr-code';
+
+
+const isHorarioValido = (turno) => {
+  const ahora = new Date();
+
+  const fechaActual = new Date();
+  const fechaTurno = new Date();
+  fechaTurno.setDate(fechaActual.getDate() + 1); // Turno es para mañana
+
+  if (turno === 'almuerzo') {
+    // Disponible desde hoy 21:00 hasta mañana 10:00
+    const inicio = new Date(fechaActual);
+    inicio.setHours(21, 0, 0, 0); // hoy a las 21:00
+
+    const fin = new Date(fechaTurno);
+    fin.setHours(10, 0, 0, 0); // mañana a las 10:00
+
+    return ahora >= inicio || ahora <= fin;
+  }
+
+  if (turno === 'cena') {
+    // Disponible desde hoy 21:00 hasta mañana 13:00
+    const inicio = new Date(fechaActual);
+    inicio.setHours(21, 0, 0, 0); // hoy a las 21:00
+
+    const fin = new Date(fechaTurno);
+    fin.setHours(13, 0, 0, 0); // mañana a las 13:00
+
+    return ahora >= inicio || ahora <= fin;
+  }
+
+  return false;
+};
+
+
+const getFechaManana = () => {
+  const fecha = new Date();
+  fecha.setDate(fecha.getDate() + 1);
+  return fecha.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: 'long'
+  });
+};
+
+
 
 const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
 //const PanelUsuario = ({ user }) => {
@@ -18,7 +67,8 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
   });*/
   const [error, setError] = useState('');
   const [confirmacion, setConfirmacion] = useState('');
-
+  const [mostrarQR, setMostrarQR] = useState(false);
+  
   const anotarTurno = async (turno) => {
     try {
       //const response = await axios.post('http://localhost:5000/api/turnos/anotarseTurno', {
@@ -42,6 +92,27 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
       setConfirmacion('');
     }
   };
+  //CANCELAR TURNO
+  const cancelarTurno = async (turno) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/turnos/cancelarTurno`, {  
+      dni: user.dni,
+      turno: turno
+    });
+    setEstadoTurnos({
+      almuerzo: response.data.user.almuerzo,
+      cena: response.data.user.cena
+    });
+    setConfirmacion(`Cancelaste el turno de ${turno}`);
+    setError('');
+  } catch (err) {
+    console.error('Error al cancelar turno:', err);
+    setError('No se pudo cancelar el turno');
+    setConfirmacion('');
+  }
+};
+
+  
 
   const logout = () => {
     localStorage.removeItem('token'); // Limpia el token si lo usás
@@ -49,10 +120,12 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
     setIsLoggedIn(false); // Vuelve a mostrar el login
   };
 
+  
   return (
     <div>
       <h2>Bienvenido, {user.dni}</h2>
 
+      {/*
       <button onClick={() => anotarTurno('almuerzo')} disabled={estadoTurnos.almuerzo}>
         {estadoTurnos.almuerzo ? 'Ya anotado para Almuerzo' : 'Anotarse para Almorzar'}
       </button>
@@ -60,6 +133,64 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
       <button onClick={() => anotarTurno('cena')} disabled={estadoTurnos.cena}>
         {estadoTurnos.cena ? 'Ya anotado para Cena' : 'Anotarse para Cenar'}
       </button>
+      
+      <button
+      onClick={() => anotarTurno('cena')}
+      disabled={estadoTurnos.cena || !puedeAnotarseParaCena()}
+      >
+      {estadoTurnos.cena
+        ? 'Ya anotado para Cena'
+          : puedeAnotarseParaCena()
+        ? 'Anotarse para Cenar'
+          : 'Fuera de horario de anotación'}
+      </button>*/}
+
+    <button
+      onClick={() => anotarTurno('almuerzo')}
+      disabled={estadoTurnos.almuerzo || !isHorarioValido('almuerzo')}
+    >
+      {estadoTurnos.almuerzo
+      ? 'Ya anotado para Almuerzo'
+      :  'Anotarse para Almorzar'}
+    </button>
+    <button
+      onClick={() => anotarTurno('cena')}
+      disabled={estadoTurnos.cena || !isHorarioValido('cena')}
+    >
+      {estadoTurnos.cena
+        ? 'Ya anotado para Cena'
+        : 'Anotarse para Cenar'}
+    </button>
+
+        <p style={{ fontStyle: 'italic', fontSize: '14px' }}>
+          Turno disponible para cenar el <strong>{getFechaManana()}</strong>.<br />
+          Podés anotarte desde hoy a las <strong>21:00</strong> hasta mañana a las <strong>10:00</strong>.
+        </p>
+      
+
+
+      {estadoTurnos.almuerzo && <button onClick={() => cancelarTurno('almuerzo')}>Cancelar Almuerzo</button>}
+      {estadoTurnos.cena && <button onClick={() => cancelarTurno('cena')}>Cancelar Cena</button>}
+
+      <br /><br />
+      <button onClick={() => setMostrarQR(!mostrarQR)}>
+        {mostrarQR ? 'Ocultar QR' : 'Mostrar QR'}
+      </button>
+
+      {mostrarQR && (
+        <div style={{ marginTop: '1rem' }}>
+          <QRCode
+            value={JSON.stringify({
+              dni: user.dni,
+              almuerzo: estadoTurnos.almuerzo,
+              cena: estadoTurnos.cena
+            })}size={128}
+          />
+           </div>
+      )}
+     
+
+      <br /><br />
 
       <br /><br />
       <button onClick={logout} style={{ backgroundColor: 'red', color: 'white' }}>

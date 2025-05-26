@@ -3,7 +3,9 @@ const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
   dni: { type: String, required: true, unique: true },
   almuerzo: { type: Boolean, default: false },
-  cena: { type: Boolean, default: false }
+  cena: { type: Boolean, default: false },
+  asistioAlmuerzo: { type: Boolean, default: false },
+  asistioCena: { type: Boolean, default: false }
   
 
   //cambiar el modelo de usario
