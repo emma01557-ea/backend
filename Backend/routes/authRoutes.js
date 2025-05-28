@@ -45,11 +45,11 @@ const JWT_SECRET = process.env.JWT_SECRET || "mi_clave_super_secreta";
 
 // Login con JWT
 router.post('/login', async (req, res) => {
-  const { dni,almuerzo,cena} = req.body;
+  const { dni,almuerzo,cena,asistioAlmuerzo,asistioCena} = req.body;
   console.log('BODY:', req.body); 
   console.log('dni: ',dni);
   console.log('almuerzo: ',almuerzo);
-  console.log('almuerzo: ',cena);
+  console.log('cena: ',cena);
   
   if (!req.body.dni) {
     return res.status(400).json({ message: "Falta DNI" });
