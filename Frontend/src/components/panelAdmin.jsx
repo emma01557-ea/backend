@@ -142,6 +142,7 @@ const PanelAdmin = ({ setVista }) => {
 
   const confirmarAsistencia = async (dni, turno) => {
     try {
+      console.log('Enviando:', { dni, turno });
       const response = await axios.post(
         `${API_BASE_URL}/turnos/confirmarAsistencia`,
         { dni, turno },
@@ -192,7 +193,30 @@ const PanelAdmin = ({ setVista }) => {
 
           try {
             const data = JSON.parse(text);
-            const { dni, turno } = data;
+            const { dni, almuerzo, cena } = data;
+            //const { dni, turno } = data;
+            // Obtener la hora actual
+            const now = new Date();
+            const hour = now.getHours();
+            let turno = undefined;
+            if (hour >= 12 && hour < 16) {
+              turno = 'almuerzo';
+            if (!almuerzo) {
+              setError(`⚠️ El usuario no está anotado para el almuerzo`);
+              return;
+            }
+            } else if (hour >= 18 && hour < 22) {
+              turno = 'cena';
+              if (!cena) {
+                setError(`⚠️ El usuario no está anotado para la cena`);
+                return;
+              }
+            } else {
+              setError('⚠️ Fuera del horario válido para confirmar asistencia');
+              return;
+            }
+
+            console.log('QR leído:', data);
             setDniLeido(dni);
             setTurnoLeido(turno);
 
@@ -272,7 +296,7 @@ const PanelAdmin = ({ setVista }) => {
       {dniLeido && !loading && (
         <div style={{ marginTop: '1rem' }}>
           <p><strong>DNI escaneado:</strong> {dniLeido}</p>
-          <p><strong>Turno Leido:</strong> {turnoLeido.almuerzo}</p>
+          <p><strong>Turno Leido:</strong> {turnoLeido}</p>
           <button onClick={() => confirmarManual('almuerzo')} style={{ marginRight: '1rem' }}>
             Confirmar Almuerzo
           </button>

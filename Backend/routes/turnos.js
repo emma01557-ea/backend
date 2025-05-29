@@ -187,6 +187,24 @@ router.get('/exportar-excel', verifyToken, async (req, res) => {
   }
 });
 
+// Ruta: POST /api/turnos/resetear
+router.post('/resetear', async (req, res) => {
+  try {
+    await User.updateMany({}, {
+      almuerzo: false,
+      cena: false,
+      asistioAlmuerzo: false,
+      asistioCena: false,
+    });
+
+    res.json({ success: true, message: 'Turnos reseteados correctamente' });
+  } catch (error) {
+    console.error('Error al resetear turnos:', error);
+    res.status(500).json({ success: false, message: 'Error al resetear turnos' });
+  }
+});
+
+
 
 
 

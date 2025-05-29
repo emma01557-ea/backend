@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   almuerzo: { type: Boolean, default: false },
   cena: { type: Boolean, default: false },
   asistioAlmuerzo: { type: Boolean, default: false },
-  asistioCena: { type: Boolean, default: false }
+  asistioCena: { type: Boolean, default: false },
   
 
   //cambiar el modelo de usario
