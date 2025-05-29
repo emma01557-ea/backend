@@ -264,6 +264,7 @@ const PanelAdmin = ({ setVista }) => {
       {dniLeido && !loading && (
         <div style={{ marginTop: '1rem' }}>
           <p><strong>DNI escaneado:</strong> {dniLeido}</p>
+          <p><strong>Turno Leido:</strong> {turnoLeido}</p>
           <button onClick={() => confirmarManual('almuerzo')} style={{ marginRight: '1rem' }}>
             Confirmar Almuerzo
           </button>
