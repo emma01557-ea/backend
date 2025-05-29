@@ -110,6 +110,85 @@ router.post('/confirmarAsistencia', verifyToken, async (req, res) => {
   }
 });
 
+router.post('/limpiar', verifyToken, async (req, res) => {
+  try {
+    await User.updateMany({}, {
+      $set: {
+        almuerzo: false,
+        cena: false,
+        asistioAlmuerzo: false,
+        asistioCena: false
+      }
+    });
+
+    return res.json({ success: true, message: 'Turnos limpiados correctamente para el nuevo día.' });
+  } catch (error) {
+    console.error('Error limpiando base:', error);
+    return res.status(500).json({ success: false, message: 'Error limpiando base' });
+  }
+});
+
+const ExcelJS = require('exceljs');
+
+router.get('/exportar-excel', verifyToken, async (req, res) => {
+  try {
+    const usuarios = await User.find({
+      $or: [
+        { almuerzo: true },
+        { cena: true }
+      ]
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Turnos');
+
+    // Cabecera
+    worksheet.columns = [
+      { header: 'DNI', key: 'dni', width: 15 },
+      { header: 'Nombre', key: 'nombre', width: 25 },
+      { header: 'Apellido', key: 'apellido', width: 25 },
+      { header: 'Grado', key: 'grado', width: 15 },
+      { header: 'Destino', key: 'destino', width: 25 },
+      { header: 'Almuerzo', key: 'almuerzo', width: 10 },
+      { header: 'Asistió Almuerzo', key: 'asistioAlmuerzo', width: 15 },
+      { header: 'Cena', key: 'cena', width: 10 },
+      { header: 'Asistió Cena', key: 'asistioCena', width: 15 },
+      { header: 'Fecha', key: 'fecha', width: 20 }
+    ];
+
+    usuarios.forEach(usuario => {
+      worksheet.addRow({
+        dni: usuario.dni,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        grado: usuario.grado,
+        destino: usuario.destino,
+        almuerzo: usuario.almuerzo ? 'Sí' : 'No',
+        asistioAlmuerzo: usuario.asistioAlmuerzo ? 'Sí' : 'No',
+        cena: usuario.cena ? 'Sí' : 'No',
+        asistioCena: usuario.asistioCena ? 'Sí' : 'No',
+        fecha: new Date().toLocaleDateString('es-AR')
+      });
+    });
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=turnos.xlsx'
+    );
+
+    await workbook.xlsx.write(res);
+    res.status(200).end();
+  } catch (error) {
+    console.error('Error generando Excel:', error);
+    res.status(500).json({ success: false, message: 'Error generando Excel' });
+  }
+});
+
+
 
 
 module.exports = router;

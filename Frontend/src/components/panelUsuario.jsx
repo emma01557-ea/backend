@@ -22,18 +22,18 @@ const isHorarioValido = (turno) => {
     const fin = new Date(fechaTurno);
     fin.setHours(10, 0, 0, 0); // mañana a las 10:00
 
-    return ahora >= inicio || ahora <= fin;
+    return ahora >= inicio && ahora <= fin;
   }
 
-  if (turno === 'cena') {
+  if (turno === 'cena'  ) {
     // Disponible desde hoy 21:00 hasta mañana 13:00
     const inicio = new Date(fechaActual);
     inicio.setHours(21, 0, 0, 0); // hoy a las 21:00
 
     const fin = new Date(fechaTurno);
-    fin.setHours(13, 0, 0, 0); // mañana a las 13:00
+    fin.setHours(10, 0, 0, 0); // mañana a las 13:00
 
-    return ahora >= inicio || ahora <= fin;
+    return ahora >= inicio && ahora <= fin;
   }
 
   return false;
@@ -163,7 +163,7 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
     </button>
 
         <p style={{ fontStyle: 'italic', fontSize: '14px' }}>
-          Turno disponible para cenar el <strong>{getFechaManana()}</strong>.<br />
+          Turno disponible para almuerzo y cena del <strong>{getFechaManana()}</strong>.<br />
           Podés anotarte desde hoy a las <strong>21:00</strong> hasta mañana a las <strong>10:00</strong>.
         </p>
       
@@ -178,7 +178,8 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
       </button>
 
       {mostrarQR && (
-        <div style={{ marginTop: '1rem' }}>
+        <div style={{ marginTop: '1rem', padding: '10px', border: '1px solid #ccc', display: 'inline-block' }}>
+          <p><strong>Tu código QR:</strong></p>
           <QRCode
             value={JSON.stringify({
               dni: user.dni,
