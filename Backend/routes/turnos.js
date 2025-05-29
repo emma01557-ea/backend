@@ -72,8 +72,12 @@ router.post('/cancelarTurno', async (req, res) => {
   }
 });
 
-router.post('/confirmarAsistencia', verifyToken, async (req, res) => {
+router.post('/confirmarAsistencia', async (req, res) => {
   const { dni, turno } = req.body;
+
+  if (!dni || !['almuerzo', 'cena'].includes(turno)) {
+    return res.status(400).json({ success: false, message: 'Datos inválidos' });
+  }
 
   try {
     const user = await User.findOne({ dni });
@@ -86,29 +90,24 @@ router.post('/confirmarAsistencia', verifyToken, async (req, res) => {
       if (!user.almuerzo) {
         return res.status(400).json({ success: false, message: 'El usuario no está anotado para el almuerzo' });
       }
-      if (user.asistioAlmuerzo) {
-        return res.status(400).json({ success: false, message: 'Ya se confirmó asistencia al almuerzo' });
-      }
       user.asistioAlmuerzo = true;
     } else if (turno === 'cena') {
       if (!user.cena) {
         return res.status(400).json({ success: false, message: 'El usuario no está anotado para la cena' });
       }
-      if (user.asistioCena) {
-        return res.status(400).json({ success: false, message: 'Ya se confirmó asistencia a la cena' });
-      }
       user.asistioCena = true;
-    } else {
-      return res.status(400).json({ success: false, message: 'Turno inválido' });
     }
 
     await user.save();
+
     return res.json({ success: true, message: 'Asistencia confirmada' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: 'Error al confirmar asistencia' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: 'Error del servidor' });
   }
 });
+
+
 
 router.post('/limpiar', verifyToken, async (req, res) => {
   try {

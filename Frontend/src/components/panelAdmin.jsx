@@ -154,9 +154,17 @@ const PanelAdmin = ({ setVista }) => {
       await fetchUsuarios();
       return response.data;
     } catch (e) {
-      console.error(e);
-      return { success: false, message: 'Error de conexión con el servidor' };
-    }
+        console.error(e);
+        // Si hay respuesta del servidor, devolver ese mensaje
+       if (e.response && e.response.data) {
+        return {
+          success: false,
+          message: e.response.data.message || 'Error del servidor',
+        };
+      }
+        // Si es un error de red o algo inesperado
+        return { success: false, message: 'Error de conexión con el servidor' };
+      }
   };
 
   const startScanner = async () => {
@@ -264,7 +272,7 @@ const PanelAdmin = ({ setVista }) => {
       {dniLeido && !loading && (
         <div style={{ marginTop: '1rem' }}>
           <p><strong>DNI escaneado:</strong> {dniLeido}</p>
-          <p><strong>Turno Leido:</strong> {turnoLeido}</p>
+          <p><strong>Turno Leido:</strong> {turnoLeido.almuerzo}</p>
           <button onClick={() => confirmarManual('almuerzo')} style={{ marginRight: '1rem' }}>
             Confirmar Almuerzo
           </button>
