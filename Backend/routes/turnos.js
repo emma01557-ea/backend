@@ -109,7 +109,7 @@ router.post('/confirmarAsistencia', async (req, res) => {
 
 
 
-router.post('/limpiar', verifyToken, async (req, res) => {
+router.post('/limpiar', async (req, res) => {
   try {
     await User.updateMany({}, {
       $set: {

@@ -37,7 +37,7 @@ const PanelAdmin = ({ setVista }) => {
       usuarios.forEach((u) => {
         // Formatear fecha (si tienes campo fecha, ejemplo: u.fechaRegistro)
         // Supongo que u.fechaRegistro es un ISO string o Date, si no ajustar
-        const fecha = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleString() : 'N/A';
+        //const fecha = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleString() : 'N/A';
 
         sheet.addRow({
         //  nombre: u.nombre,
@@ -66,22 +66,32 @@ const PanelAdmin = ({ setVista }) => {
   };
 
   // --- Función para borrar la base después de las 21 horas ---
-  const HORA_LIMPIEZA = 21;
-  const limpiarBaseSiEsHora = async () => {
-  const ahora = new Date();
-  const hoy = ahora.toISOString().split('T')[0];
-  const ultimaLimpieza = localStorage.getItem('ultimaLimpieza');
-
-  if (ahora.getHours() >= HORA_LIMPIEZA && ultimaLimpieza !== hoy) {
+  const HORA_LIMPIEZA = 11;
+  const limpiarBaseSiEsHora = async () => 
+  {
+    const ahora = new Date();
+    const hoy = ahora.toISOString().split('T')[0];
+    //const ultimaLimpieza = localStorage.getItem('ultimaLimpieza');
+    
+    if (ahora.getHours() >= HORA_LIMPIEZA) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/turnos/limpiar`);
-      if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
-      }
-
-      localStorage.setItem('ultimaLimpieza', hoy); // Guardamos la fecha
-      setConfirmacion('Base de datos limpiada para nuevo día');
-      setUsuarios([]);
+      console.log('Token enviado:', localStorage.getItem('token'));
+      //console.log('Token enviado ultima:', localStorage.getItem('ultimaLimpieza'));
+      const response = await axios.post(
+        `${API_BASE_URL}/turnos/limpiar`,
+        { },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+         
+      //localStorage.setItem('ultimaLimpieza', hoy); // Guardamos la fecha
+      //setConfirmacion('Base de datos limpiada para nuevo día');
+      //setUsuarios([]);
+      setConfirmacion(response.data.message || 'Turnos limpiados correctamente');
+      await fetchUsuarios(); // refrescar la lista de usuarios si es necesario
     } catch (err) {
       console.error('Error al limpiar base', err);
       setError('No se pudo limpiar la base de datos');
