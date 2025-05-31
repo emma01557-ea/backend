@@ -20,7 +20,7 @@ const isHorarioValido = (turno) => {
 
     //const fin = new Date(fechaTurno);
     const fin = new Date(fechaActual);
-    fin.setHours(13, 0, 0, 0); // hpy a las 10:00
+    fin.setHours(10, 0, 0, 0); // hpy a las 10:00
 
     return ahora >= inicio && ahora <= fin;
   }
@@ -32,7 +32,7 @@ const isHorarioValido = (turno) => {
 
     //const fin = new Date(fechaTurno);
     const fin = new Date(fechaActual);
-    fin.setHours(13, 0, 0, 0); // mañana a las 19:00
+    fin.setHours(10, 0, 0, 0); // mañana a las 19:00
 
     return ahora >= inicio && ahora <= fin;
   }

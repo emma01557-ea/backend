@@ -66,7 +66,7 @@ const PanelAdmin = ({ setVista }) => {
   };
 
   // --- Función para borrar la base después de las 21 horas ---
-  const HORA_LIMPIEZA = 11;
+  const HORA_LIMPIEZA = 21;
   const limpiarBaseSiEsHora = async () => 
   {
     const ahora = new Date();
