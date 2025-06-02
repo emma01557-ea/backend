@@ -54,7 +54,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToAdmin }) => {
         elevation={10}
         sx={{
           width: '100%',
-          maxWidth: 300,
+          maxWidth: 500,
           p: 4,
           borderRadius: 4,
           textAlign: 'center',
@@ -70,7 +70,7 @@ const LoginForm = ({ onLoginSuccess, onSwitchToAdmin }) => {
 
         {/* Título y subtítulo */}
         <Typography variant="h5" fontWeight="bold" sx={{ color: 'white', mb: 1 }}>
-          Bienvenidos
+          Bienvenido
         </Typography>
         <Typography variant="body1" sx={{ color: 'white', mb: 3 }}>
           Ingrese su DNI para registrarse
