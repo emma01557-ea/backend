@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../api.js'; // ajustá el path si es necesario
-//import QRCode from 'qrcode.react';
-//import { QRCode } from 'qrcode.react';
-//import QRCode from 'react-qr-code';
 import { QRCode } from 'react-qr-code';
+import {
+  Box,
+  Button,
+  Typography,
+  Paper,
+  Stack,
+  Alert
+} from '@mui/material';
 
 
 const isHorarioValido = (turno) => {
@@ -49,8 +54,6 @@ const getFechaManana = () => {
     month: 'long'
   });
 };
-
-
 
 const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
 //const PanelUsuario = ({ user }) => {
@@ -120,85 +123,259 @@ const PanelUsuario = ({ user, setIsLoggedIn, setUser }) => {
     setUser(null);
     setIsLoggedIn(false); // Vuelve a mostrar el login
   };
-
   
-  return (
-    <div>
-      <h2>Bienvenido, {user.dni}</h2>
-
-      {/*
-      <button onClick={() => anotarTurno('almuerzo')} disabled={estadoTurnos.almuerzo}>
-        {estadoTurnos.almuerzo ? 'Ya anotado para Almuerzo' : 'Anotarse para Almorzar'}
-      </button>
-
-      <button onClick={() => anotarTurno('cena')} disabled={estadoTurnos.cena}>
-        {estadoTurnos.cena ? 'Ya anotado para Cena' : 'Anotarse para Cenar'}
-      </button>
-      
-      <button
-      onClick={() => anotarTurno('cena')}
-      disabled={estadoTurnos.cena || !puedeAnotarseParaCena()}
-      >
-      {estadoTurnos.cena
-        ? 'Ya anotado para Cena'
-          : puedeAnotarseParaCena()
-        ? 'Anotarse para Cenar'
-          : 'Fuera de horario de anotación'}
-      </button>*/}
-
-    <button
-      onClick={() => anotarTurno('almuerzo')}
-      disabled={estadoTurnos.almuerzo || !isHorarioValido('almuerzo')}
+/*return (
+    <Box
+      sx={{
+        maxWidth: 500,
+        mx: 'auto',
+        mt: 6,
+        p: 4,
+        borderRadius: 4,
+        boxShadow: 3,
+        bgcolor: '#f9f9f9'
+      }}
     >
-      {estadoTurnos.almuerzo
-      ? 'Ya anotado para Almuerzo'
-      :  'Anotarse para Almorzar'}
-    </button>
-    <button
-      onClick={() => anotarTurno('cena')}
-      disabled={estadoTurnos.cena || !isHorarioValido('cena')}
+      <Typography variant="h5" gutterBottom>
+        Bienvenido, {user.dni}
+      </Typography>
+
+      <Typography sx={{ mb: 2 }} fontSize="14px" fontStyle="italic">
+        Turnos disponibles para el día <strong>{getFechaManana()}</strong>.<br />
+        <strong>Almuerzo/Cena:</strong> desde hoy a las <strong>06:00</strong> hasta <strong>10:00</strong>.
+      </Typography>
+
+      <Stack spacing={2}>
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={estadoTurnos.almuerzo || !isHorarioValido('almuerzo')}
+          onClick={() => anotarTurno('almuerzo')}
+        >
+          {estadoTurnos.almuerzo ? 'Ya anotado para Almuerzo' : 'Anotarse para Almorzar'}
+        </Button>
+
+        <Button
+          variant="contained"
+          color="primary"
+          disabled={estadoTurnos.cena || !isHorarioValido('cena')}
+          onClick={() => anotarTurno('cena')}
+        >
+          {estadoTurnos.cena ? 'Ya anotado para Cena' : 'Anotarse para Cenar'}
+        </Button>
+
+        {estadoTurnos.almuerzo && (
+          <Button variant="outlined" color="warning" onClick={() => cancelarTurno('almuerzo')}>
+            Cancelar Almuerzo
+          </Button>
+        )}
+
+        {estadoTurnos.cena && (
+          <Button variant="outlined" color="warning" onClick={() => cancelarTurno('cena')}>
+            Cancelar Cena
+          </Button>
+        )}
+
+        <Button variant="outlined" onClick={() => setMostrarQR(!mostrarQR)}>
+          {mostrarQR ? 'Ocultar QR' : 'Mostrar QR'}
+        </Button>
+
+        {mostrarQR && (
+          <Paper elevation={2} sx={{ p: 2, textAlign: 'center', mt: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>Tu código QR:</Typography>
+            <QRCode
+              value={JSON.stringify({
+                dni: user.dni,
+                almuerzo: estadoTurnos.almuerzo,
+                cena: estadoTurnos.cena
+              })}
+              size={128}
+            />
+          </Paper>
+        )}
+
+        <Button variant="contained" color="error" onClick={logout}>
+          Cerrar sesión
+        </Button>
+
+        {confirmacion && <Alert severity="success">{confirmacion}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
+      </Stack>
+    </Box>
+  );*/
+return (
+  <Box
+    sx={{
+      minHeight: '100vh',
+      backgroundImage: 'url(/background.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      px: 2,
+    }}
+  >
+    <Paper
+      elevation={10}
+      sx={{
+        width: '100%',
+        maxWidth: 500,
+        p: 4,
+        borderRadius: 4,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        color: 'white',
+      }}
     >
-      {estadoTurnos.cena
-        ? 'Ya anotado para Cena'
-        : 'Anotarse para Cenar'}
-    </button>
+      <Typography variant="h5" gutterBottom fontWeight="bold">
+        Bienvenido, usted ingresó con el DNI: {user.dni}
+      </Typography>
 
-        <p style={{ fontStyle: 'italic', fontSize: '14px' }}>
-          Turnos disponibles para Almuerzo y cena del dia  <strong>{getFechaManana()}</strong>.<br />
-          <strong>Almuerzo/Cena:</strong> desde hoy a las <strong>06:00</strong> hasta a las <strong>10:00</strong>.<br />
-        </p>
-      
+      <Typography sx={{ mb: 2 }} fontSize="14px" fontStyle="italic">
+        Turnos disponibles para el día <strong>{getFechaManana()}</strong>.<br />
+        <strong>Almuerzo/Cena:</strong> desde hoy a las <strong>06:00</strong> hasta <strong>10:00</strong>.
+      </Typography>
 
+      <Stack spacing={2}>
+        <Button
+          fullWidth
+          disabled={estadoTurnos.almuerzo || !isHorarioValido('almuerzo')}
+          onClick={() => anotarTurno('almuerzo')}
+          sx={{
+            backgroundColor: '#FFD700',
+            color: 'white',
+            fontWeight: 'bold',
+            py: 1.5,
+            '&:hover': {
+              backgroundColor: '#e6c200',
+            },
+          }}
+        >
+          {estadoTurnos.almuerzo ? 'Ya anotado para Almuerzo' : 'Anotarse para Almorzar'}
+        </Button>
 
-      {estadoTurnos.almuerzo && <button onClick={() => cancelarTurno('almuerzo')}>Cancelar Almuerzo</button>}
-      {estadoTurnos.cena && <button onClick={() => cancelarTurno('cena')}>Cancelar Cena</button>}
+        <Button
+          fullWidth
+          disabled={estadoTurnos.cena || !isHorarioValido('cena')}
+          onClick={() => anotarTurno('cena')}
+          sx={{
+            backgroundColor: '#FFD700',
+            color: 'white',
+            fontWeight: 'bold',
+            py: 1.5,
+            '&:hover': {
+              backgroundColor: '#e6c200',
+            },
+          }}
+        >
+          {estadoTurnos.cena ? 'Ya anotado para Cena' : 'Anotarse para Cenar'}
+        </Button>
 
-      <br /><br />
-      <button onClick={() => setMostrarQR(!mostrarQR)}>
-        {mostrarQR ? 'Ocultar QR' : 'Mostrar QR'}
-      </button>
-      <br /><br />
-      {mostrarQR && (
-        <div style={{ marginTop: '1rem', padding: '10px', border: '1px solid #ccc', display: 'inline-block' }}>
-          <p><strong>Tu código QR:</strong></p>
-          <QRCode
-            value={JSON.stringify({
-              dni: user.dni,
-              almuerzo: estadoTurnos.almuerzo,
-              cena: estadoTurnos.cena
-            })}size={128}
-          />
-           </div>
-      )}
-      <br /><br />
-      <button onClick={logout} style={{ backgroundColor: 'red', color: 'white' }}>
-        Cerrar sesión
-      </button>
+        {estadoTurnos.almuerzo && (
+          <Button
+            fullWidth
+            variant="outlined"
+            color="warning"
+            disabled={!isHorarioValido('almuerzo')}
+            onClick={() => cancelarTurno('almuerzo')}
+            sx={{
+              borderColor: '#FFA500',
+              color: '#FFA500',
+              '&:hover': {
+                backgroundColor: 'rgba(255,165,0,0.1)',
+              },
+            }}
+          >
+            Cancelar Almuerzo
+          </Button>
+        )}
 
-      {confirmacion && <p style={{ color: 'green' }}>{confirmacion}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
-  );
+        {estadoTurnos.cena && (
+          <Button
+            fullWidth
+            variant="outlined"
+            color="warning"
+            disabled={!isHorarioValido('cena')}
+            onClick={() => cancelarTurno('cena')}
+            sx={{
+              borderColor: '#FFA500',
+              color: '#FFA500',
+              '&:hover': {
+                backgroundColor: 'rgba(255,165,0,0.1)',
+              },
+            }}
+          >
+            Cancelar Cena
+          </Button>
+        )}
+
+        <Button
+          fullWidth
+          variant="outlined"
+          onClick={() => setMostrarQR(!mostrarQR)}
+          sx={{
+            borderColor: '#FFD700',
+            color: '#FFD700',
+            fontWeight: 'bold',
+            '&:hover': {
+              backgroundColor: 'rgba(255,215,0,0.1)',
+            },
+          }}
+        >
+          {mostrarQR ? 'Ocultar QR' : 'Mostrar QR'}
+        </Button>
+
+        {mostrarQR && (
+          <Paper
+            elevation={2}
+            sx={{
+              p: 2,
+              textAlign: 'center',
+              mt: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              color: 'white',
+            }}
+          >
+            <Typography variant="subtitle1" gutterBottom>
+              Tu código QR:
+            </Typography>
+            <QRCode
+              value={JSON.stringify({
+                dni: user.dni,
+                almuerzo: estadoTurnos.almuerzo,
+                cena: estadoTurnos.cena,
+              })}
+              size={128}
+            />
+          </Paper>
+        )}
+
+        <Button
+          fullWidth
+          onClick={logout}
+          sx={{
+            backgroundColor: '#FF4C4C',
+            color: 'white',
+            fontWeight: 'bold',
+            py: 1.5,
+            '&:hover': {
+              backgroundColor: '#e64545',
+            },
+          }}
+        >
+          Cerrar sesión
+        </Button>
+
+        {confirmacion && <Alert severity="success">{confirmacion}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
+      </Stack>
+    </Paper>
+  </Box>
+);
+
 };
-
 export default PanelUsuario;

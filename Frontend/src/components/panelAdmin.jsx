@@ -4,7 +4,21 @@ import axios from 'axios';
 import ExcelJS from 'exceljs';
 import API_BASE_URL from '../api.js';
 import { useNavigate } from 'react-router-dom';
-
+import {
+  Container,
+  Typography,
+  Button,
+  Paper,
+  Box,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Divider,
+  CircularProgress,
+  Stack,
+} from '@mui/material';
 const PanelAdmin = ({ setVista }) => {
   const videoRef = useRef(null);
   const codeReaderRef = useRef(null);
@@ -17,6 +31,8 @@ const PanelAdmin = ({ setVista }) => {
   const [loading, setLoading] = useState(false);
   const [usuarios, setUsuarios] = useState([]);
   const navigate = useNavigate();
+
+  
 
   // --- Función para descargar Excel ---
   const descargarExcel = async () => {
@@ -122,6 +138,7 @@ const PanelAdmin = ({ setVista }) => {
   const stopScanner = () => {
     codeReaderRef.current?.reset();
     setCameraOn(false);
+    resetStates();
   };
 
   const resetStates = () => {
@@ -213,16 +230,22 @@ const PanelAdmin = ({ setVista }) => {
               turno = 'almuerzo';
             if (!almuerzo) {
               setError(`⚠️ El usuario no está anotado para el almuerzo`);
+              codeReader.reset();
+              setCameraOn(false);
               return;
             }
             } else if (hour >= 18 && hour < 22) {
               turno = 'cena';
               if (!cena) {
                 setError(`⚠️ El usuario no está anotado para la cena`);
+                codeReader.reset();
+                setCameraOn(false);
                 return;
               }
             } else {
               setError('⚠️ Fuera del horario válido para confirmar asistencia');
+              codeReader.reset();
+            setCameraOn(false);
               return;
             }
 
@@ -286,7 +309,7 @@ const PanelAdmin = ({ setVista }) => {
     };
   }, []);
 
-  return (
+ /* return (
     <div style={{ maxWidth: '600px', margin: 'auto', textAlign: 'center' }}>
       <h2>Panel Administrador - Escanear QR</h2>
 
@@ -357,7 +380,196 @@ const PanelAdmin = ({ setVista }) => {
         Cerrar sesión
       </button>
     </div>
+  );*/
+return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundImage: 'url(/background.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        px: 2,
+        py: 4,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+      }}
+    >
+      <Paper
+        elevation={10}
+        sx={{
+          width: '100%',
+          maxWidth: 700,
+          p: 4,
+          borderRadius: 4,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          color: 'white',
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Panel Administrador - Escanear QR
+        </Typography>
+
+        <Button
+          variant="contained"
+          onClick={toggleCamera}
+          sx={{
+            mb: 2,
+            backgroundColor: cameraOn ? '#e53935' : '#1976d2',
+            '&:hover': {
+              backgroundColor: cameraOn ? '#b71c1c' : '#115293',
+            },
+            fontWeight: 'bold',
+          }}
+        >
+          {cameraOn ? '📴 Apagar cámara' : '📷 Encender cámara'}
+        </Button>
+
+        {cameraOn && (
+          <Typography sx={{ color: '#2196f3', mb: 2 }}>🎥 Cámara encendida</Typography>
+        )}
+
+        <Box sx={{ width: '100%', mb: 2 }}>
+          <video
+            ref={videoRef}
+            style={{
+              width: '100%',
+              borderRadius: 8,
+              border: '2px solid #FFD700',
+              backgroundColor: '#000',
+            }}
+            autoPlay
+            muted
+            playsInline
+          />
+        </Box>
+
+        {loading && <CircularProgress color="inherit" sx={{ mb: 2 }} />}
+        {confirmacion && (
+          <Typography sx={{ color: 'lightgreen', mb: 2 }}>{confirmacion}</Typography>
+        )}
+        {error && (
+          <Typography sx={{ color: '#f44336', mb: 2 }}>{error}</Typography>
+        )}
+
+        {dniLeido && !loading && (
+          <Box sx={{ mb: 3, textAlign: 'left' }}>
+            <Typography>
+              <strong>DNI escaneado:</strong> {dniLeido}
+            </Typography>
+            <Typography sx={{ mb: 1 }}>
+              <strong>Turno Leido:</strong> {turnoLeido}
+            </Typography>
+
+            <Button
+              variant="contained"
+              onClick={() => confirmarManual('almuerzo')}
+              sx={{
+                mr: 2,
+                backgroundColor: '#FFD700',
+                color: 'black',
+                fontWeight: 'bold',
+                '&:hover': { backgroundColor: '#e6c200' },
+              }}
+            >
+              Confirmar Almuerzo
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => confirmarManual('cena')}
+              sx={{
+                backgroundColor: '#FFD700',
+                color: 'black',
+                fontWeight: 'bold',
+                '&:hover': { backgroundColor: '#e6c200' },
+              }}
+            >
+              Confirmar Cena
+            </Button>
+          </Box>
+        )}
+
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.3)', my: 3 }} />
+
+        <Typography variant="h6" gutterBottom>
+          Usuarios anotados para almuerzo o cena
+        </Typography>
+
+        {usuarios.length === 0 ? (
+          <Typography>No hay usuarios anotados para almuerzo o cena.</Typography>
+        ) : (
+          <Table
+            sx={{
+              color: 'white',
+              '& th, & td': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                borderStyle: 'solid',
+                borderWidth: 1,
+              },
+            }}
+            size="small"
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>DNI</TableCell>
+                <TableCell>Almuerzo</TableCell>
+                <TableCell>Cena</TableCell>
+                <TableCell>Asistió al Almuerzo</TableCell>
+                <TableCell>Asistió a la Cena</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {usuarios.map((u) => (
+                <TableRow key={u._id}>
+                  <TableCell>{u.dni}</TableCell>
+                  <TableCell>{u.almuerzo ? '✔️' : ''}</TableCell>
+                  <TableCell>{u.cena ? '✔️' : ''}</TableCell>
+                  <TableCell>{u.asistioAlmuerzo ? '✅' : ''}</TableCell>
+                  <TableCell>{u.asistioCena ? '✅' : ''}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+
+        <Box sx={{ mt: 3 }}>
+          <Button
+            variant="contained"
+            onClick={descargarExcel}
+            sx={{
+              mr: 2,
+              backgroundColor: '#FFD700',
+              color: 'black',
+              fontWeight: 'bold',
+              '&:hover': { backgroundColor: '#e6c200' },
+            }}
+          >
+            Descargar Excel
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={handleLogout}
+            sx={{
+              backgroundColor: '#e53935',
+              color: 'white',
+              fontWeight: 'bold',
+              '&:hover': { backgroundColor: '#b71c1c' },
+            }}
+          >
+            Cerrar sesión
+          </Button>
+        </Box>
+      </Paper>
+    </Box>
   );
+
+
+
+
 };
 
 export default PanelAdmin;

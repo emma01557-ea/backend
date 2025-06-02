@@ -1,10 +1,17 @@
-// src/components/LoginAdmin.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../api';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  CircularProgress
+} from '@mui/material';
 
 const LoginAdmin = ({ onLoginSuccess, onBackToUserLogin }) => {
-  const [username, setUsername] = useState(''); // o email si querés
+  const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,7 +34,7 @@ const LoginAdmin = ({ onLoginSuccess, onBackToUserLogin }) => {
       });
 
       localStorage.setItem('adminToken', response.data.token);
-      onLoginSuccess(response.data.admin); // podés enviar el adminData como user
+      onLoginSuccess(response.data.admin);
 
     } catch (err) {
       console.error('Error en login admin:', err.response?.data || err.message);
@@ -38,77 +45,117 @@ const LoginAdmin = ({ onLoginSuccess, onBackToUserLogin }) => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Login Administrador</h2>
-      <form onSubmit={handleLogin} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          required
-          style={styles.input}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-          style={styles.input}
-        />
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
-      </form>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundImage: 'url(/background.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: 2,
+      }}
+    >
+      <Paper
+        elevation={10}
+        sx={{
+          width: '100%',
+          maxWidth: 350,
+          p: 4,
+          borderRadius: 4,
+          textAlign: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+        }}
+      >
+        {/* Logo */}
+        <Box sx={{ mb: 2 }}>
+          <img src="/logo.png" alt="Logo" style={{ height: 120 }} />
+        </Box>
 
-      {error && <p style={styles.error}>{error}</p>}
+        {/* Título */}
+        <Typography variant="h5" fontWeight="bold" sx={{ color: 'white', mb: 3 }}>
+          Login Administrador
+        </Typography>
 
-      <button onClick={onBackToUserLogin} style={styles.link}>
-        Volver a login usuario
-      </button>
-    </div>
+        <Box component="form" onSubmit={handleLogin}>
+          <TextField
+            label="Usuario"
+            variant="outlined"
+            fullWidth
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            sx={{
+              mb: 2,
+              '& .MuiInputBase-root': { color: 'white' },
+              '& .MuiInputLabel-root': { color: 'white' },
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: '#FFD700' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#FFD700' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#FFD700' },
+            }}
+          />
+
+          <TextField
+            label="Contraseña"
+            type="password"
+            variant="outlined"
+            fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            sx={{
+              mb: 3,
+              '& .MuiInputBase-root': { color: 'white' },
+              '& .MuiInputLabel-root': { color: 'white' },
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: '#FFD700' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#FFD700' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#FFD700' },
+            }}
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            disabled={loading}
+            sx={{
+              backgroundColor: '#FFD700',
+              color: 'black',
+              fontWeight: 'bold',
+              py: 1.5,
+              '&:hover': {
+                backgroundColor: '#e6c200',
+              },
+              mb: 2,
+            }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Ingresar'}
+          </Button>
+        </Box>
+
+        {error && (
+          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+            {error}
+          </Typography>
+        )}
+
+        <Typography
+          variant="body2"
+          onClick={onBackToUserLogin}
+          sx={{
+            mt: 2,
+            color: '#FFD700',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+          }}
+        >
+          Volver a login usuario
+        </Typography>
+      </Paper>
+    </Box>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '350px',
-    margin: 'auto',
-    padding: '1rem',
-    border: '1px solid #ccc',
-    borderRadius: '8px'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px'
-  },
-  input: {
-    padding: '8px',
-    fontSize: '1rem'
-  },
-  button: {
-    padding: '10px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer'
-  },
-  error: {
-    color: 'red',
-    marginTop: '10px'
-  },
-  link: {
-    background: 'none',
-    color: '#007bff',
-    border: 'none',
-    cursor: 'pointer',
-    padding: 0,
-    fontSize: '1rem',
-    marginTop: '10px'
-  }
 };
 
 export default LoginAdmin;
